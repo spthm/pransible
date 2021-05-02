@@ -1,0 +1,9 @@
+---
+- name: restart avahi service
+  become: yes
+  systemd:
+    name: avahi-daemon.service
+    daemon_reload: yes
+    enabled: yes
+    state: restarted
+...

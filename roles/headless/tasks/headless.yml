@@ -1,0 +1,46 @@
+---
+- name: Remove GUI packages
+  apt:
+    name: "{{ gui_packages }}"
+    purge: yes
+    state: absent
+  notify: autoremove
+
+- name: Install vim
+  apt:
+    name: vim
+    state: present
+
+- name: Advertise SSH Service via Avahi
+  template:
+    src: templates/ssh.service.j2
+    dest: /etc/avahi/services/ssh.service
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart avahi service
+
+- name: Boot into text console mode, without auto-login
+  command: raspi-config nonint do_boot_behaviour B1
+
+- name: Set GPU memory to 16 MB
+  command: raspi-config nonint do_memory_split 16
+
+- name: Set hostname to {{ hostname }}
+  hostname:
+    name: "{{ hostname }}"
+
+- name: Modify IPv4 in /etc/hosts for new hostname {{ hostname }}
+  lineinfile:
+    dest: /etc/hosts
+    regexp: "^127.0.0.1"
+    line: "127.0.0.1{{ '\t' }}{{ hostname }}{{ '\t' }}localhost"
+    state: present
+
+- name: Modify IPv6 in /etc/hosts for new hostname {{ hostname }}
+  lineinefile:
+    dest: /etc/hosts
+    regexp: "^::1"
+    line: "::1{{ '`t`t' }}{{ hostname }}{{ '\t' }}localhost ip6-localhost ip6-loopback"
+    state: present
+...

@@ -1,0 +1,17 @@
+---
+- name: Remove educational packages
+  apt:
+    name: "{{ edu_packages }}"
+    purge: yes
+    state: absent
+  become: yes
+  notify: autoremove
+
+- name: Remove Java packages
+  apt:
+    name: "{{ java_packages }}"
+    purge: yes
+    state: absent
+  become: yes
+  notify: autoremove
+...

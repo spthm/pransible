@@ -1,0 +1,15 @@
+---
+- name: Restart fail2ban service
+  systemd:
+    become: yes
+    name: fail2ban.service
+    enabled: yes
+    state: restarted
+
+- name: Restart sshd service
+  systemd:
+    become: yes
+    name: sshd.service
+    enabled: yes
+    state: restarted
+...

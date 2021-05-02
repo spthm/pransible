@@ -1,0 +1,58 @@
+// Sample Configuration File for Shairport Sync
+// Commented out settings are generally the defaults, except where noted.
+// Some sections are operative only if Shairport Sync has been built with the right configuration flags.
+// See the individual sections for details.
+
+// General Settings
+general =
+{
+	name = {{ airplay_name }}; // This is the name the service will advertise to iTunes.
+	output_backend = "alsa"; // Run "shairport-sync -h" to get a list of all output_backends, e.g. "alsa", "pipe", "stdout". The default is the first one.
+	mdns_backend = "avahi"; // Run "shairport-sync -h" to get a list of all mdns_backends. The default is the first one.
+	port = {{ shairport_tcp_port }}; // Listen for service requests on this port
+	udp_port_base = {{ shairport_udp_port_base }}; // start allocating UDP ports from this port number when needed
+	udp_port_range = {{ shairport_udp_port_range }}; // look for free ports in this number of places, starting at the UDP port base. Allow at least 10, though only three are needed in a steady state.
+	drift_tolerance_in_seconds = {{ shairport_drift_tolerance_in_seconds }}; // allow a timing error of this number of seconds of drift away from exact synchronisation before attempting to correct it
+};
+
+// Advanced parameters for controlling how Shairport Sync stays active and how it runs a session
+sessioncontrol =
+{
+	allow_session_interruption = "no"; // set to "yes" to allow another device to interrupt Shairport Sync while it's playing from an existing audio source
+	session_timeout = {{ shairport_session_timeout }}; // wait for this number of seconds after a source disappears before terminating the session and becoming available again.
+};
+
+// Back End Settings
+
+// These are parameters for the "alsa" audio back end.
+// For this section to be operative, Shairport Sync must be built with the following configuration flag:
+// --with-alsa
+alsa =
+{
+//	output_device = "default"; // the name of the alsa output device. Use "alsamixer" or "aplay" to find out the names of devices, mixers, etc.
+//	mixer_control_name = "PCM"; // the name of the mixer to use to adjust output volume. If not specified, volume in adjusted in software.
+//	mixer_device = "default"; // the mixer_device default is whatever the output_device is. Normally you wouldn't have to use this.
+//	output_rate = "auto"; // can be "auto", 44100, 88200, 176400 or 352800, but the device must have the capability.
+//	output_format = "auto"; // can be "auto", "U8", "S8", "S16", "S16_LE", "S16_BE", "S24", "S24_LE", "S24_BE", "S24_3LE", "S24_3BE", "S32", "S32_LE" or "S32_BE" but the device must have the capability. Except where stated using (*LE or *BE), endianness matches that of the processor.
+//	disable_synchronization = "no"; // Set to "yes" to disable synchronization. Default is "no".
+//	period_size = <number>; // Use this optional advanced setting to set the alsa period size near to this value
+//	buffer_size = <number>; // Use this optional advanced setting to set the alsa buffer size near to this value
+//	use_mmap_if_available = "yes"; // Use this optional advanced setting to control whether MMAP-based output is used to communicate  with the DAC. Default is "yes"
+//	use_hardware_mute_if_available = "no"; // Use this optional advanced setting to control whether the hardware in the DAC is used for muting. Default is "no", for compatibility with other audio players.
+//	maximum_stall_time = 0.200; // Use this optional advanced setting to control how long to wait for data to be consumed by the output device before considering it an error. It should never approach 200 ms.
+//	use_precision_timing = "auto"; // Use this optional advanced setting to control how Shairport Sync gathers timing information. When set to "auto", if the output device is a real hardware device, precision timing will be used. Choose "no" for more compatible standard timing, choose "yes" to force the use of precision timing, which may cause problems.
+//	disable_standby_mode = "never"; // This setting prevents the DAC from entering the standby mode. Some DACs make small "popping" noises when they go in and out of standby mode. Settings can be: "always", "auto" or "never". Default is "never", but only for backwards compatibility. The "auto" setting prevents entry to standby mode while Shairport Sync is in the "active" mode. You can use "yes" instead of "always" and "no" instead of "never".
+//	disable_standby_mode_silence_threshold = 0.040; // Use this optional advanced setting to control how little audio should remain in the output buffer before the disable_standby code should start sending silence to the output device.
+//	disable_standby_mode_silence_scan_interval = 0.004; // Use this optional advanced setting to control how often the amount of audio remaining in the output buffer should be checked.
+};
+
+// Diagnostic settings. These are for diagnostic and debugging only. Normally you should leave them commented out
+diagnostics =
+{
+//	disable_resend_requests = "no"; // set this to yes to stop Shairport Sync from requesting the retransmission of missing packets. Default is "no".
+//	statistics = "no"; // set to "yes" to print statistics in the log
+//	log_verbosity = 0; // "0" means no debug verbosity, "3" is most verbose.
+//	log_show_time_since_startup = "no"; // set this to yes if you want the time since startup in the debug message -- seconds down to nanoseconds
+//	log_show_time_since_last_message = "yes"; // set this to yes if you want the time since the last debug message in the debug message -- seconds down to nanoseconds
+//	drop_this_fraction_of_audio_packets = 0.0; // use this to simulate a noisy network where this fraction of UDP packets are lost in transmission. E.g. a value of 0.001 would mean an average of 0.1% of packets are lost, which is actually quite a high figure.
+};

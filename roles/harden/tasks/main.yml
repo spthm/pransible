@@ -1,0 +1,4 @@
+---
+- import_tasks: harden.yml
+  become: yes
+...

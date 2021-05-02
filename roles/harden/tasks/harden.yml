@@ -1,0 +1,128 @@
+---
+- name: Create a user
+  vars_prompt:
+  - name: username
+    prompt: Enter a new user name
+    private: no
+
+- name: Create user {{ username }}
+  user:
+    name: {{ username }}
+    createhome: yes
+    groups: adm, sudo, users
+    append: yes
+    password: "*"
+    update_password: on_create
+    state: present
+  register: newuser
+
+- name: Set a password for {{ username }}
+  vars_prompt:
+  - name: password
+    prompt: Enter a password for {{ username }}
+    confirm: yes
+    private: yes
+    unsafe: yes
+  when: new_user.changed
+
+- name: Set new password for {{ username }}
+  user:
+    name: {{ username }}
+    password: "{{ password | password_hash('sha512') }}"
+  when: new_user.changed
+
+- name: Remove default pi user
+  user:
+    name: pi
+    remove: yes
+    state: absent
+  when: username != "pi"
+
+- name: Configure sshd
+  template:
+    src: templates/sshd_config.j2
+    dest: /etc/ssh/sshd_config
+    owner: root
+    group: root
+    mode: "0600"
+    validate: "/usr/sbin/sshd -T -f %s"
+  notify: Restart sshd service
+
+- name: Install ufw
+  apt:
+    name: ufw
+    state: latest
+
+- name: Deny everything, but do not enable
+  ufw:
+    state: disabled
+    direction: in
+    default: deny
+
+- name: Set UFW logging to low
+  ufw:
+    logging: low
+
+- name: Allow access from private (RFC1918) and link-local networks over SSH
+  ufw:
+    rule: allow
+    direction: in
+    port: 22
+    proto: tcp
+    src: '{{ item }}'
+    loop: {{ private_local_addresses }}
+
+- name: Enable firewall
+  ufw:
+    state: enable
+
+- name: Harden against common network attack vectors
+  template:
+    src: templates/sysctl-local.conf.j2
+    dest: /etc/sysctl.d/local.conf
+    ower: root
+    group: root
+    mode: "0644"
+
+- name: Install fail2ban
+  apt:
+    name: fail2ban
+    state: latest
+
+- name: Configure fail2ban
+  template:
+    src: templates/jail.local.j2
+    dest: /etc/fail2ban/jail.local
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart fail2ban service
+
+- name: Set DNS servers
+  lineinfile:
+    path: /etc/dhcpcd.conf
+    regex: "domain_name_servers="
+    line: "static domain_name_servers=208.67.222.222 208.67.220.220"
+    state: present
+
+- name: Install unattended-upgrades
+  apt:
+    name: unattended-upgrades
+    state: latest
+
+- name: Configure APT auto-upgrades
+  template:
+    src: auto-upgrades.j2
+    dest: /etc/apt/apt.conf.d/20auto-upgrades
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Configure unattended-upgrades
+  template:
+    src: unattended-upgrades.j2
+    dest: /etc/apt/apt.conf.d/50unattended-upgrades
+    owner: root
+    group: root
+    mode: 0644
+...

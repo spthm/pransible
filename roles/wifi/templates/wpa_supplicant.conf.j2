@@ -1,0 +1,13 @@
+country={{ wifi_country_code }}
+ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+update_config=1
+
+network={
+    ssid="{{ wifi_ssid }}"
+    proto=RSN
+    auth_alg=OPEN
+    key_mgmt=WPA-PSK
+    pairwise=CCMP
+    group=CCMP
+    psk={{ wpa_passphrase_psk }}
+}

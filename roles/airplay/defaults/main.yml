@@ -1,0 +1,26 @@
+---
+shairport_dep_packages:
+  - build-essential
+  - git
+  - xmltoman
+  - autoconf
+  - automake
+  - libtool
+  - libpopt-dev
+  - libconfig-dev
+  - libasound2-dev
+  - avahi-daemon
+  - libavahi-client-dev
+  - libssl-dev
+
+shairport_dir: /src/shairport-sync
+
+shairport_version: 3.3.2
+
+shairport_tcp_port: 5000
+shairport_udp_ports: "6001:6003"
+shairport_udp_port_base: 6001
+shairport_udp_port_range: 3
+shairport_drift_tolerance_in_seconds: 0.010
+shairport_session_timeout: 45
+...
