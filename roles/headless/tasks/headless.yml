@@ -26,9 +26,33 @@
 - name: Set GPU memory to 16 MB
   command: raspi-config nonint do_memory_split 16
 
+- name: Disable camera interface
+  command: raspi-config nonint do_camera 1
+
+- name: Disable the VNC Server
+  command: raspi-config nonint do_vnc 1
+
+- name: Disable SPI
+  command: raspi-config nonint do_spi 1
+
+- name: Disable I2C
+  command: raspi-config nonint do_i2c 1
+
+- name: Disable Serial interface
+  command: raspi-config nonint do_serial 1
+
+- name: Disable 1-wire
+  command: raspi-config nonint do_onewire 1
+
+- name: Disable remote GPIO
+  command: raspi-config nonint do_rgpio 1
+
 - name: Set hostname to {{ hostname }}
   hostname:
     name: "{{ hostname }}"
+
+- name: Set hostname with raspi-config {{ hostname }}
+  command: raspi-config nonint do_hostname {{ hostname }}
 
 - name: Modify IPv4 in /etc/hosts for new hostname {{ hostname }}
   lineinfile:
@@ -43,4 +67,24 @@
     regexp: "^::1"
     line: "::1{{ '`t`t' }}{{ hostname }}{{ '\t' }}localhost ip6-localhost ip6-loopback"
     state: present
+
+- name: Turn off the power LED at night
+  cron:
+    minute: "00"
+    hour: "20"
+    job: "echo 0 > /sys/class/leds/led1/brightness"
+    user: root
+
+- name: Turn on the power LED in the morning
+  cron:
+    minute: "00"
+    hour: "08"
+    job: "echo 1 > /sys/class/leds/led1/brightness"
+    user: root
+
+- name: Turn off the power LED after reboot
+  cron:
+    special_time: reboot
+    job: "echo 0 > /sys/class/leds/led1/brightness"
+    user: root
 ...
