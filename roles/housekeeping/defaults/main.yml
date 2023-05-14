@@ -1,0 +1,9 @@
+---
+log2ram_dep_packages:
+  - git
+  - rsync
+
+log2ram_version: 1.6.1
+
+log2ram_dir: /src/log2ram
+...

@@ -1,0 +1,60 @@
+---
+- name: Enable tmp.mount
+  systemd:
+    become: yes
+    name: tmp.mount
+    enabled: yes
+    state: started
+
+- name: Create tmp.mount config directory
+  file:
+    path: /etc/systemd/system/tmp.mount.d/
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Configure tmp.mount
+  template:
+    src: templates/size.conf.j2
+    dest: /etc/systemd/system/tmp.mount.d/size.conf
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Install log2ram dependencies
+  apt:
+    name: {{ log2ram_dep_packages }}
+    status: latest
+
+- name: Create log2ram directory
+  file:
+    path: "{{ log2ram_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Clone log2ram
+  git:
+    repo: https://github.com/azlux/log2ram.git
+    dest: {{ log2ram_dir }}
+    version: {{ log2ram_version }}
+    depth: 1
+
+- name: Install log2ram
+  command: sh {{log2ram_dir}}/install.sh
+
+- name: Set log2ram reserved size in RAM
+  lineinfile:
+    path: /etc/log2ram.conf
+    regexp: "^SIZE="
+    line: "SIZE=50M"
+
+- name: Set log2ram write to disk to weekly on Mondays
+  lineinfile:
+    path: /etc/systemd/system/log2ram-daily.timer"
+    regex: "^OnCalendar="
+    line: "OnCalendar=Mon *-*-* 05:00:00"
+    state: present
+...
