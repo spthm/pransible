@@ -61,4 +61,18 @@
     line: "OnCalendar=Mon *-*-* 05:00:00"
     state: present
   notify: restart tmp.mount
+
+- name: Disable swap
+  ansible.builtin.command: dphys-swapfile swapoff
+
+- name: Uninstall dphys-swapfile
+  ansible.builtin.command: dphys-swapfile uninstall
+
+- name: Stop and disable dphys-swapfile service
+  ansible.builtin.systemd:
+    become: yes
+    name: dphys-swapfile
+    enabled: no
+    state: stopped
+  notify: reboot
 ...
