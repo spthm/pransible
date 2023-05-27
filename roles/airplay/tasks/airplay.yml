@@ -70,7 +70,7 @@
   become: yes
 
 - name: Configure build for shairport-sync
-  ansible.builtin.command: ./configure --sysconfdir=/etc --with-alsa --with-soxr --with-avahi --with-ssl=openssl --with-systemd
+  ansible.builtin.command: ./configure --sysconfdir=/etc --with-alsa --with-avahi --with-ssl=openssl --with-systemd
   args:
     chdir: "{{ shairport_dir }}"
   become: yes
