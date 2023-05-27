@@ -22,20 +22,9 @@
     name: ufw
     state: latest
 
-- name: Deny everything, but do not enable
-  community.general.ufw:
-    state: disabled
-    direction: in
-    default: deny
-
-- name: Set UFW logging to low
-  community.general.ufw:
-    state: disabled
-    logging: low
-
 - name: Allow access from private (RFC1918) and link-local networks over SSH
   community.general.ufw:
-    state: disabled
+    state: enabled
     rule: allow
     direction: in
     port: 22
@@ -43,9 +32,12 @@
     src: "{{ item }}"
   loop: "{{ private_local_addresses }}"
 
-- name: Enable firewall
+- name: Deny everything else, set low logging
   community.general.ufw:
-    state: enable
+    state: enabled
+    direction: incoming
+    default: deny
+    logging: low
 
 - name: Harden against common network attack vectors
   ansible.builtin.template:
