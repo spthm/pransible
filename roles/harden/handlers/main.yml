@@ -1,22 +1,22 @@
 ---
 - name: Restart dhcpcd service
-  systemd:
-    become: yes
+  ansible.builtin.systemd:
     name: dhcpcd.service
     enabled: yes
     state: restarted
+  become: yes
 
 - name: Restart fail2ban service
-  systemd:
-    become: yes
+  ansible.builtin.systemd:
     name: fail2ban.service
     enabled: yes
     state: restarted
+  become: yes
 
 - name: Restart sshd service
-  systemd:
-    become: yes
+  ansible.builtin.systemd:
     name: sshd.service
     enabled: yes
     state: restarted
+  become: yes
 ...

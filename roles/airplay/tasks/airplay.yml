@@ -6,7 +6,7 @@
     port: "{{ shairport_tcp_port }}"
     proto: tcp
     src: "{{ item }}"
-    loop: "{{ private_local_addresses }}"
+  loop: "{{ private_local_addresses }}"
 
 - name: Open mDNS port for AirPlay
   community.general.ufw:
@@ -15,7 +15,7 @@
     port: 5353
     proto: udp
     src: "{{ item }}"
-    loop: "{{ private_local_addresses }}"
+  loop: "{{ private_local_addresses }}"
 
 - name: Open ports for shairport-sync for AirPlay
   community.general.ufw:
@@ -24,12 +24,12 @@
     port: "{{ shairport_ports }}"
     proto: udp
     src: "{{ item }}"
-    loop: "{{ private_local_addresses }}"
+  loop: "{{ private_local_addresses }}"
 
 - name: Install shairport-sync dependencies
   ansible.builtin.apt:
     name: "{{ shairport_dep_packages }}"
-    status: latest
+    state: latest
 
 - name: Create shairport-sync group
   ansible.builtin.group:
@@ -89,7 +89,6 @@
 
 - name: Enable shareport-sync
   ansible.builtin.systemd:
-    become: yes
     name: shairport-sync.service
     enabled: yes
     state: restarted

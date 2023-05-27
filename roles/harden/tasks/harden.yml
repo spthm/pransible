@@ -41,7 +41,7 @@
     port: 22
     proto: tcp
     src: "{{ item }}"
-    loop: "{{ private_local_addresses }}"
+  loop: "{{ private_local_addresses }}"
 
 - name: Enable firewall
   community.general.ufw:
@@ -51,7 +51,7 @@
   ansible.builtin.template:
     src: templates/sysctl-local.conf.j2
     dest: /etc/sysctl.d/local.conf
-    ower: root
+    owner: root
     group: root
     mode: "0644"
 

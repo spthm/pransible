@@ -9,7 +9,7 @@
 - name: Install vim
   ansible.builtin.apt:
     name: vim
-    state: present
+    state: latest
 
 - name: Advertise SSH Service via Avahi
   ansible.builtin.template:
@@ -18,7 +18,7 @@
     owner: root
     group: root
     mode: "0644"
-  notify: Restart avahi service
+  notify: restart avahi service
 
 - name: Boot into text console mode, without auto-login
   ansible.builtin.command: raspi-config nonint do_boot_behaviour B1
@@ -51,6 +51,7 @@
 
 - name: Turn off the power LED at night
   ansible.builtin.cron:
+    name: "turn off power LED in the evening"
     minute: "00"
     hour: "20"
     job: "echo 0 > /sys/class/leds/led1/brightness"
@@ -59,6 +60,7 @@
 
 - name: Turn on the power LED in the morning
   ansible.builtin.cron:
+    name: "turn on power LED in the morning"
     minute: "00"
     hour: "08"
     job: "echo 1 > /sys/class/leds/led1/brightness"
@@ -67,6 +69,7 @@
 
 - name: Turn off the power LED after reboot
   ansible.builtin.cron:
+    name: "turn on power LED after reboot"
     special_time: reboot
     job: "echo 0 > /sys/class/leds/led1/brightness"
     user: root

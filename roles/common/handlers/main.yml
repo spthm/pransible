@@ -2,4 +2,5 @@
 - name: reboot
   ansible.builtin.reboot:
     reboot_timeout: 300
+  become: yes
 ...

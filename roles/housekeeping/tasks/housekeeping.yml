@@ -1,10 +1,10 @@
 ---
 - name: Enable tmp.mount
   ansible.builtin.systemd:
-    become: yes
     name: tmp.mount
     enabled: yes
     state: started
+  become: yes
   notify: reboot
 
 - name: Create tmp.mount config directory
@@ -27,7 +27,7 @@
 - name: Install log2ram dependencies
   ansible.builtin.apt:
     name: "{{ log2ram_dep_packages }}"
-    status: latest
+    state: latest
 
 - name: Create log2ram directory
   ansible.builtin.file:
@@ -56,11 +56,11 @@
 
 - name: Set log2ram write to disk to weekly on Mondays
   ansible.builtin.lineinfile:
-    path: /etc/systemd/system/log2ram-daily.timer"
+    path: /etc/systemd/system/log2ram-daily.timer
     regex: "^OnCalendar="
     line: "OnCalendar=Mon *-*-* 05:00:00"
     state: present
-  notify: restart tmp.mount
+  notify: restart log2ram
 
 - name: Disable swap
   ansible.builtin.command: dphys-swapfile swapoff
@@ -70,7 +70,6 @@
 
 - name: Stop and disable dphys-swapfile service
   ansible.builtin.systemd:
-    become: yes
     name: dphys-swapfile
     enabled: no
     state: stopped

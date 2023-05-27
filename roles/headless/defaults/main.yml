@@ -20,4 +20,6 @@ gui_packages:
   - xserver-xorg*
   - xpdf
   - zenity
+
+ssh_port: 22
 ...
