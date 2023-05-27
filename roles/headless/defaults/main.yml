@@ -1,33 +1,23 @@
 ---
 gui_packages:
-  - xserver-xorg-video-fbdev
-  - xserver-xorg
-  - xinit
-  - gstreamer1.0-x
-  - gstreamer1.0-omx
-  - gstreamer1.0-plugins-base
-  - gstreamer1.0-plugins-good
-  - gstreamer1.0-plugins-bad
-  - gstreamer1.0-alsa
-  - gstreamer1.0-libav
+  - desktop-base
+  - dillo
   - epiphany-browser
+  - gnome*
+  - gtk2-engines
+  - lightdm
   - lxde
+  - lxpolkit
   - lxtask
   - menu-xdg
-  - gksu
-  - xserver-xorg-video-fbturbo
-  - xpdf
-  - gtk2-engines
   - netsurf-gtk
-  - zenity
-  - desktop-base
-  - lxpolkit
+  - qt5*
+  - qtbase5*
+  - raspberrypi-ui-mods
   - weston
-  - omxplayer
-  - raspberrypi-artwork
-  - lightdm
-  - gnome-themes-standard-data
-  - gnome-icon-theme
-  - qt50-snapshot
-  - qt50-quick-particle-examples
+  - x2x
+  - xinit
+  - xserver-xorg*
+  - xpdf
+  - zenity
 ...

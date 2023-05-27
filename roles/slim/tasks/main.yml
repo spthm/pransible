@@ -14,4 +14,20 @@
     state: absent
   become: yes
   notify: autoremove
+
+- name: Remove Python packages
+  ansible.builtin.apt:
+    name: "{{ python_packages }}"
+    purge: yes
+    state: absent
+  become: yes
+  notify: autoremove
+
+- name: Remove misc packages
+  ansible.builtin.apt:
+    name: "{{ misc_packages }}"
+    purge: yes
+    state: absent
+  become: yes
+  notify: autoremove
 ...

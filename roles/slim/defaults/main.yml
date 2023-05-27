@@ -1,44 +1,45 @@
 ---
 edu_packages:
-  - idle
-  - python3-pygame
-  - python-pygame
-  - python-tk
-  - idle3
-  - python3-tk
-  - python3-rpi.gpio
-  - python-serial
-  - python3-serial
-  - python-picamera
-  - python3-picamera
-  - python3-pygame
-  - python-pygame
-  - python-tk
-  - python3-tk
-  - debian-reference-en
-  - dillo
-  - x2x
   - scratch
+  - scratch3
   - nuscratch
-  - raspberrypi-ui-mods
-  - timidity
   - smartsim
-  - penguinspuzzle
-  - pistore
   - sonic-pi
-  - python3-numpy
-  - python-pifacecommon
-  - python3-pifacecommon
-  - python-pifacedigitalio
-  - python3-pifacedigitalio
-  - python3-pifacedigital-scratch-handler
-  - minecraft-pi
-  - python-minecraftpi
   - wolfram-engine
 
 java_packages:
-  - oracle-java8-jdk
-  - oracle-java7-jdk
+  - default-jdk
   - openjdk*
   - icedtea*
+
+misc_packages:
+  - debian-reference-en
+  - libcamera*
+  - gstreamer1.0*
+  - timidity
+
+python_packages:
+  - idle
+  - idle3
+  - python-picamera
+  - python-picraft
+  - python-tk
+  - python3-colorzero
+  - python3-piexif
+  - python3-gpiozero
+  - python3-libcamera
+  - python3-minecraftpi
+  - python3-numpy
+  - python3-picamera*
+  - python3-picraft
+  - python3-pidng
+  - python3-pil
+  - python3-pygame
+  - python3-rpi.gpio
+  - python3-serial
+  - python3-serial-asyncio
+  - python3-simplejpeg
+  - python3-spidev
+  - python3-tk
+  - python3-v4l2
 ...
