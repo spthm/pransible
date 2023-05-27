@@ -1,8 +1,4 @@
 ---
-- name: Reload wpa_supplicant
-  become: yes
-  command: wpa_cli -i wlan0 reconfigure
-
 - name: Checking if Realtek 8192 driver loaded
   shell: lsmod | grep 8192
   register: lsmod_8192

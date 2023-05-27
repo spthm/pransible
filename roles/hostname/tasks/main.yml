@@ -1,0 +1,4 @@
+---
+- import_tasks: hostname.yml
+  become: yes
+...

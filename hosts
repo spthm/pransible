@@ -1,0 +1,2 @@
+[airplay]
+hipi ansible_host=hipi.local hostname=hipi.local

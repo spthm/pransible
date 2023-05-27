@@ -1,0 +1,19 @@
+---
+- name: Generate WiFi psk
+  ansible.builtin.shell: wpa_passphrase "{{ wifi_ssid }}" "{{ wifi_passphrase }}" | sed -En 's/^\s*psk=(.*)$/\1/p'
+  no_log: True
+  register: wpa_passphrase_psk
+
+- set_fact:
+   wpa_passphrase_psk: "{{ wpa_passphrase_psk.stdout }}"
+
+- name: "Configure WiFi network {{ wifi_ssid }}"
+  become: yes
+  ansible.builtin.template:
+    src: templates/wpa_supplicant.conf.j2
+    dest: /etc/wpa_supplicant/wpa_supplicant.conf
+    owner: root
+    group: root
+    mode: "0600"
+  notify: Reload wpa_supplicant
+...

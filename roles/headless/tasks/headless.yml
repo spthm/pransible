@@ -47,27 +47,6 @@
 - name: Disable remote GPIO
   command: raspi-config nonint do_rgpio 1
 
-- name: Set hostname to {{ hostname }}
-  hostname:
-    name: "{{ hostname }}"
-
-- name: Set hostname with raspi-config {{ hostname }}
-  command: raspi-config nonint do_hostname {{ hostname }}
-
-- name: Modify IPv4 in /etc/hosts for new hostname {{ hostname }}
-  lineinfile:
-    dest: /etc/hosts
-    regexp: "^127.0.0.1"
-    line: "127.0.0.1{{ '\t' }}{{ hostname }}{{ '\t' }}localhost"
-    state: present
-
-- name: Modify IPv6 in /etc/hosts for new hostname {{ hostname }}
-  lineinefile:
-    dest: /etc/hosts
-    regexp: "^::1"
-    line: "::1{{ '`t`t' }}{{ hostname }}{{ '\t' }}localhost ip6-localhost ip6-loopback"
-    state: present
-
 - name: Turn off the power LED at night
   cron:
     minute: "00"

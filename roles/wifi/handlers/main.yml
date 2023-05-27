@@ -1,0 +1,5 @@
+---
+- name: Reload wpa_supplicant
+  become: yes
+  command: wpa_cli -i wlan0 reconfigure
+...

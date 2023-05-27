@@ -1,0 +1,33 @@
+---
+- name: Generate a local SSH keypair for ansible
+  local_action:
+    module: community.crypto.openssh_keypair
+    path: "{{ lookup('env', 'HOME') }}/.ssh/id_ansible"
+    type: ed25519
+    regenerate: never
+  run_once: true
+
+- name: Capture SSH public key
+  local_action:
+    module: ansible.builtin.shell
+    cmd: cat "{{ lookup('env', 'HOME') }}/.ssh/id_ansible.pub"
+  register: ssh_pub_key
+
+- name: "Create user {{ username }}"
+  ansible.builtin.user:
+    name: "{{ username }}"
+    createhome: yes
+    groups: adm, sudo, users
+    append: yes
+    password: "{{ password | password_hash('sha512') }}"
+    update_password: on_create
+    state: present
+  become: yes
+
+- name: "Install SSH public key for {{ username }}"
+  ansible.posix.authorized_key:
+    user: "{{ username }}"
+    state: present
+    key: "{{ ssh_pub_key.stdout }}"
+  become: yes
+...

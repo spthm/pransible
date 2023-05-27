@@ -1,0 +1,23 @@
+---
+- hosts: all
+  vars:
+    username: ansible
+  vars_prompt:
+    - name: password
+      prompt: "Enter a password for 'ansible' user'"
+      confirm: yes
+      private: yes
+      unsafe: yes
+    - name: wifi_ssid
+      prompt: Enter your WiFi SSID
+      private: no
+    - name: wifi_passphrase
+      prompt: Enter your WiFi password
+      private: yes
+      confirm: yes
+  remote_user: "{{ bootstrap_user }}"
+  roles:
+    - ansible
+    - hostname
+    - wifi
+...
