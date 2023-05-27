@@ -1,6 +1,6 @@
 ---
 - name: autoremove
-  apt:
+  ansible.builtin.apt:
     autoremove: yes
     autoclean: yes
   become: yes

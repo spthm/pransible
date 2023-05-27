@@ -1,13 +1,13 @@
 ---
 - name: Remove default pi user
-  user:
+  ansible.builtin.user:
     name: pi
     remove: yes
     state: absent
-  when: username != "pi"
+  when: ansible_user_id != "pi"
 
 - name: Configure sshd
-  template:
+  ansible.builtin.template:
     src: templates/sshd_config.j2
     dest: /etc/ssh/sshd_config
     owner: root
@@ -17,35 +17,37 @@
   notify: Restart sshd service
 
 - name: Install ufw
-  apt:
+  ansible.builtin.apt:
     name: ufw
     state: latest
 
 - name: Deny everything, but do not enable
-  ufw:
+  community.general.ufw:
     state: disabled
     direction: in
     default: deny
 
 - name: Set UFW logging to low
-  ufw:
+  community.general.ufw:
+    state: disabled
     logging: low
 
 - name: Allow access from private (RFC1918) and link-local networks over SSH
-  ufw:
+  community.general.ufw:
+    state: disabled
     rule: allow
     direction: in
     port: 22
     proto: tcp
-    src: '{{ item }}'
-    loop: {{ private_local_addresses }}
+    src: "{{ item }}"
+    loop: "{{ private_local_addresses }}"
 
 - name: Enable firewall
-  ufw:
+  community.general.ufw:
     state: enable
 
 - name: Harden against common network attack vectors
-  template:
+  ansible.builtin.template:
     src: templates/sysctl-local.conf.j2
     dest: /etc/sysctl.d/local.conf
     ower: root
@@ -53,12 +55,12 @@
     mode: "0644"
 
 - name: Install fail2ban
-  apt:
+  ansible.builtin.apt:
     name: fail2ban
     state: latest
 
 - name: Configure fail2ban
-  template:
+  ansible.builtin.template:
     src: templates/jail.local.j2
     dest: /etc/fail2ban/jail.local
     owner: root
@@ -67,19 +69,19 @@
   notify: Restart fail2ban service
 
 - name: Set DNS servers
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/dhcpcd.conf
     regex: "domain_name_servers="
     line: "static domain_name_servers=208.67.222.222 208.67.220.220"
     state: present
 
 - name: Install unattended-upgrades
-  apt:
+  ansible.builtin.apt:
     name: unattended-upgrades
     state: latest
 
 - name: Configure APT auto-upgrades
-  template:
+  ansible.builtin.template:
     src: auto-upgrades.j2
     dest: /etc/apt/apt.conf.d/20auto-upgrades
     owner: root
@@ -87,7 +89,7 @@
     mode: 0644
 
 - name: Configure unattended-upgrades
-  template:
+  ansible.builtin.template:
     src: unattended-upgrades.j2
     dest: /etc/apt/apt.conf.d/50unattended-upgrades
     owner: root

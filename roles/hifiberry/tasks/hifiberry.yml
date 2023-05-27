@@ -1,30 +1,30 @@
 ---
 - name: Remove onboard sound driver
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /boot/config.txt
     state: absent
     regexp: "^dtparam=audio=on"
 
 - name: Disable vc4-fkms-3d
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/selinux/config
     regexp: '^dtoverlay=vc4-fkms-v3d'
     line: dtoverlay=vc4-fkms-v3d,audio=off
 
 - name: Disable vc4-kms-3d
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/selinux/config
     regexp: '^dtoverlay=vc4-kms-v3d'
     line: dtoverlay=vc4-kms-v3d,noaudio
 
 - name: Enable Dac+
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /boot/config.txt
     line: "dtoverlay=hifiberry-dacplus"
     state: present
 
 - name: Configure alsa
-  template:
+  ansible.builtin.template:
     src: templates/asound.conf.j2
     dest: /etc/asound.conf
     owner: root
@@ -32,7 +32,7 @@
     mode: "0644"
 
 - name: Turn off HiFi Berry DAC lights after boot
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/rc.local
     line: (sleep 10 && amixer -q set Digital 0% && aplay -q -D sysdefault -c 2 /usr/share/sounds/alsa/Noise.wav; amixer -q set Digital 100%) &
     state: present

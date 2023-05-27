@@ -1,44 +1,44 @@
 ---
 - name: Open Real Time Streaming port for AirPlay
-  ufw:
+  community.general.ufw:
     rule: allow
     direction: in
-    port: {{ shairport_tcp_port }}
+    port: "{{ shairport_tcp_port }}"
     proto: tcp
-    src: '{{ item }}'
-    loop: {{ private_local_addresses }}
+    src: "{{ item }}"
+    loop: "{{ private_local_addresses }}"
 
-- name: Open MDNS port for AirPlay
-  ufw:
+- name: Open mDNS port for AirPlay
+  community.general.ufw:
     rule: allow
     direction: in
     port: 5353
     proto: udp
-    src: '{{ item }}'
-    loop: {{ private_local_addresses }}
+    src: "{{ item }}"
+    loop: "{{ private_local_addresses }}"
 
 - name: Open ports for shairport-sync for AirPlay
-  ufw:
+  community.general.ufw:
     rule: allow
     direction: in
-    port: {{ shairport_ports }}
+    port: "{{ shairport_ports }}"
     proto: udp
-    src: '{{ item }}'
-    loop: {{ private_local_addresses }}
+    src: "{{ item }}"
+    loop: "{{ private_local_addresses }}"
 
 - name: Install shairport-sync dependencies
-  apt:
-    name: {{ shairport_dep_packages }}
+  ansible.builtin.apt:
+    name: "{{ shairport_dep_packages }}"
     status: latest
 
 - name: Create shairport-sync group
-  group:
+  ansible.builtin.group:
     name: shairport-sync
     system: yes
     state: present
 
 - name: Create shairport-sync user
-  user:
+  ansible.builtin.user:
     name: shairport-sync
     shell: /usr/bin/nologin
     system: yes
@@ -49,7 +49,7 @@
     state: present
 
 - name: Create shairport-sync directory
-  file:
+  ansible.builtin.file:
     path: "{{ shairport_dir }}"
     state: directory
     owner: root
@@ -57,38 +57,38 @@
     mode: 0755
 
 - name: Clone shairport-sync
-  git:
+  ansible.builtin.git:
     repo: https://github.com/mikebrady/shairport-sync.git
-    dest: {{ shairport_dir }}
-    version: {{ shairport_version }}
+    dest: "{{ shairport_dir }}"
+    version: "{{ shairport_version }}"
     depth: 1
 
 - name: Generate build system files for shairport-sync
-  command: autoreconf -fi
+  ansible.builtin.command: autoreconf -fi
   args:
-    chdir: {{ shairport_dir }}
+    chdir: "{{ shairport_dir }}"
   become: yes
 
 - name: Configure build for shairport-sync
-  command: ./configure --sysconfdir=/etc --with-alsa --with-soxr --with-avahi --with-ssl=openssl --with-systemd
+  ansible.builtin.command: ./configure --sysconfdir=/etc --with-alsa --with-soxr --with-avahi --with-ssl=openssl --with-systemd
   args:
-    chdir: {{ shairport_dir }}
+    chdir: "{{ shairport_dir }}"
   become: yes
 
 - name: Build shairport-sync
-  command: make
+  ansible.builtin.command: make
   args:
-    chdir: {{ shairport_dir }}
+    chdir: "{{ shairport_dir }}"
   become: yes
 
 - name: Install shairport-sync
-  command: make install
+  ansible.builtin.command: make install
   args:
-    chdir: {{ shairport_dir }}
+    chdir: "{{ shairport_dir }}"
   become: yes
 
 - name: Enable shareport-sync
-  systemd:
+  ansible.builtin.systemd:
     become: yes
     name: shairport-sync.service
     enabled: yes

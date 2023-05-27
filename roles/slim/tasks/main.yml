@@ -1,6 +1,6 @@
 ---
 - name: Remove educational packages
-  apt:
+  ansible.builtin.apt:
     name: "{{ edu_packages }}"
     purge: yes
     state: absent

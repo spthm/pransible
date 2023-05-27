@@ -1,6 +1,6 @@
 ---
 - name: Checking if Realtek 8192 driver loaded
-  shell: lsmod | grep 8192
+  ansible.builtin.shell: lsmod | grep 8192
   register: lsmod_8192
   failed_when: lsmod_8192.rc == 2
   changed_when: false
@@ -10,7 +10,7 @@
 
 - name: Disabling WiFi power saving
   become: yes
-  template:
+  ansible.builtin.template:
     src: templates/8192.conf.j2
     dest: /etc/modprobe.d/8192.conf
     owner: root

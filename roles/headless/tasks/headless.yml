@@ -1,18 +1,18 @@
 ---
 - name: Remove GUI packages
-  apt:
+  ansible.builtin.apt:
     name: "{{ gui_packages }}"
     purge: yes
     state: absent
   notify: autoremove
 
 - name: Install vim
-  apt:
+  ansible.builtin.apt:
     name: vim
     state: present
 
 - name: Advertise SSH Service via Avahi
-  template:
+  ansible.builtin.template:
     src: templates/ssh.service.j2
     dest: /etc/avahi/services/ssh.service
     owner: root
@@ -21,48 +21,48 @@
   notify: Restart avahi service
 
 - name: Boot into text console mode, without auto-login
-  command: raspi-config nonint do_boot_behaviour B1
+  ansible.builtin.command: raspi-config nonint do_boot_behaviour B1
 
 - name: Set GPU memory to 16 MB
-  command: raspi-config nonint do_memory_split 16
+  ansible.builtin.command: raspi-config nonint do_memory_split 16
 
 - name: Disable camera interface
-  command: raspi-config nonint do_camera 1
+  ansible.builtin.command: raspi-config nonint do_camera 1
 
 - name: Disable the VNC Server
-  command: raspi-config nonint do_vnc 1
+  ansible.builtin.command: raspi-config nonint do_vnc 1
 
 - name: Disable SPI
-  command: raspi-config nonint do_spi 1
+  ansible.builtin.command: raspi-config nonint do_spi 1
 
 - name: Disable I2C
-  command: raspi-config nonint do_i2c 1
+  ansible.builtin.command: raspi-config nonint do_i2c 1
 
 - name: Disable Serial interface
-  command: raspi-config nonint do_serial 1
+  ansible.builtin.command: raspi-config nonint do_serial 1
 
 - name: Disable 1-wire
-  command: raspi-config nonint do_onewire 1
+  ansible.builtin.command: raspi-config nonint do_onewire 1
 
 - name: Disable remote GPIO
-  command: raspi-config nonint do_rgpio 1
+  ansible.builtin.command: raspi-config nonint do_rgpio 1
 
 - name: Turn off the power LED at night
-  cron:
+  ansible.builtin.cron:
     minute: "00"
     hour: "20"
     job: "echo 0 > /sys/class/leds/led1/brightness"
     user: root
 
 - name: Turn on the power LED in the morning
-  cron:
+  ansible.builtin.cron:
     minute: "00"
     hour: "08"
     job: "echo 1 > /sys/class/leds/led1/brightness"
     user: root
 
 - name: Turn off the power LED after reboot
-  cron:
+  ansible.builtin.cron:
     special_time: reboot
     job: "echo 0 > /sys/class/leds/led1/brightness"
     user: root
