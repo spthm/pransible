@@ -17,6 +17,20 @@
     mode: "0644"
   when: loaded_8192_driver
 
+- name: Check for tmp.mount systemd unit
+  ansible.builtin.shell: systemctl status tmp.mount
+  register: tmpmount_status
+  become: yes
+  failed_when: tmpmount_status.rc > 4
+
+- ansible.builtin.set_fact:
+    tmpmount_missing: "{{ tmpmount_status.rc == 4 }}"
+
+- name: Install tmp.mount systemd unit
+  ansible.builtin.shell: systemctl enable /usr/share/systemd/tmp.mount
+  become: yes
+  when: tmpmount_missing
+
 - name: Enable tmp.mount
   ansible.builtin.systemd:
     name: tmp.mount
