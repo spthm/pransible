@@ -2,7 +2,6 @@
 shairport_dep_packages:
   - build-essential
   - git
-  - xmltoman
   - autoconf
   - automake
   - libtool
@@ -12,10 +11,11 @@ shairport_dep_packages:
   - avahi-daemon
   - libavahi-client-dev
   - libssl-dev
+  - libsoxr-dev
 
 shairport_dir: /src/shairport-sync
 
-shairport_version: 3.3.2
+shairport_version: 4.2
 
 shairport_tcp_port: 5000
 shairport_udp_ports: "6001:6003"
