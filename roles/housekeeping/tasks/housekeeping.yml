@@ -56,6 +56,13 @@
     mode: 0644
   notify: restart tmp.mount
 
+- name: Limit /var/log/journal size
+  ansible.builtin.lineinfile:
+    path: /etc/systemd/journald.conf
+    regexp: 'SystemMaxUse='
+    line: SystemMaxUse=30M
+  notify: restart journald
+
 - name: Install log2ram dependencies
   ansible.builtin.apt:
     name: "{{ log2ram_dep_packages }}"
@@ -75,16 +82,43 @@
     dest: "{{ log2ram_dir }}"
     version: "{{ log2ram_version }}"
     depth: 1
+  register: log2ram_clone
+
+- name: Check if log2ram installed
+  ansible.builtin.shell: systemctl status log2ram
+  register: log2ram_status
+  become: yes
+  failed_when: log2ram_status.rc > 4
+
+- ansible.builtin.set_fact:
+    log2ram_installed: "{{ log2ram_status.rc != 4 }}"
+
+- name: Disable log2ram
+  ansible.builtin.systemd:
+    name: log2ram
+    enabled: no
+    state: stopped
+  when: log2ram_clone.changed and log2ram_installed
 
 - name: Install log2ram
-  ansible.builtin.command: "sh {{ log2ram_dir }}/install.sh"
+  ansible.builtin.command:
+    chdir: "{{ log2ram_dir }}"
+    cmd: "sh -e {{ log2ram_dir }}/install.sh"
+  when: not log2ram_installed
 
 - name: Set log2ram reserved size in RAM
   ansible.builtin.lineinfile:
     path: /etc/log2ram.conf
     regexp: "^SIZE="
-    line: "SIZE=50M"
-  notify: restart tmp.mount
+    line: "SIZE=100M"
+  notify: restart log2ram
+
+- name: Set log2ram mailer off
+  ansible.builtin.lineinfile:
+    path: /etc/log2ram.conf
+    regexp: "^MAIL="
+    line: "MAIL=false"
+  notify: restart log2ram
 
 - name: Set log2ram write to disk to weekly on Mondays
   ansible.builtin.lineinfile:
