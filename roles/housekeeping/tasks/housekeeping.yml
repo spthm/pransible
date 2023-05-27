@@ -5,6 +5,7 @@
     name: tmp.mount
     enabled: yes
     state: started
+  notify: reboot
 
 - name: Create tmp.mount config directory
   ansible.builtin.file:
@@ -21,6 +22,7 @@
     owner: root
     group: root
     mode: 0644
+  notify: restart tmp.mount
 
 - name: Install log2ram dependencies
   ansible.builtin.apt:
@@ -50,6 +52,7 @@
     path: /etc/log2ram.conf
     regexp: "^SIZE="
     line: "SIZE=50M"
+  notify: restart tmp.mount
 
 - name: Set log2ram write to disk to weekly on Mondays
   ansible.builtin.lineinfile:
@@ -57,4 +60,5 @@
     regex: "^OnCalendar="
     line: "OnCalendar=Mon *-*-* 05:00:00"
     state: present
+  notify: restart tmp.mount
 ...

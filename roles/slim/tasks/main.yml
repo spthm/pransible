@@ -8,7 +8,7 @@
   notify: autoremove
 
 - name: Remove Java packages
-  apt:
+  ansible.builtin.apt:
     name: "{{ java_packages }}"
     purge: yes
     state: absent

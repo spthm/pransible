@@ -17,4 +17,11 @@
     group: root
     mode: "0644"
   when: loaded_8192_driver
+
+- name: restart tmp.mount
+  ansible.builtin.systemd:
+    become: yes
+    name: tmp.mount
+    enabled: yes
+    state: restarted
 ...

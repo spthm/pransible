@@ -22,9 +22,11 @@
 
 - name: Boot into text console mode, without auto-login
   ansible.builtin.command: raspi-config nonint do_boot_behaviour B1
+  notify: reboot
 
 - name: Set GPU memory to 16 MB
   ansible.builtin.command: raspi-config nonint do_memory_split 16
+  notify: reboot
 
 - name: Disable camera interface
   ansible.builtin.command: raspi-config nonint do_camera 1
@@ -53,6 +55,7 @@
     hour: "20"
     job: "echo 0 > /sys/class/leds/led1/brightness"
     user: root
+  notify: reboot
 
 - name: Turn on the power LED in the morning
   ansible.builtin.cron:
@@ -60,10 +63,12 @@
     hour: "08"
     job: "echo 1 > /sys/class/leds/led1/brightness"
     user: root
+  notify: reboot
 
 - name: Turn off the power LED after reboot
   ansible.builtin.cron:
     special_time: reboot
     job: "echo 0 > /sys/class/leds/led1/brightness"
     user: root
+  notify: reboot
 ...

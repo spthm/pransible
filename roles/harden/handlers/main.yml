@@ -1,4 +1,11 @@
 ---
+- name: Restart dhcpcd service
+  systemd:
+    become: yes
+    name: dhcpcd.service
+    enabled: yes
+    state: restarted
+
 - name: Restart fail2ban service
   systemd:
     become: yes

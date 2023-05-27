@@ -5,6 +5,7 @@
     remove: yes
     state: absent
   when: ansible_user_id != "pi"
+  notify: reboot
 
 - name: Configure sshd
   ansible.builtin.template:
@@ -74,6 +75,7 @@
     regex: "domain_name_servers="
     line: "static domain_name_servers=1.1.1.1 1.0.0.1"
     state: present
+  notify: Restart dhcpcd service
 
 - name: Install unattended-upgrades
   ansible.builtin.apt:
