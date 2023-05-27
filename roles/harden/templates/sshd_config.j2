@@ -8,6 +8,8 @@
 # possible, but leave them commented.  Uncommented options override the
 # default value.
 
+Include /etc/ssh/sshd_config.d/*.conf
+
 #Port 22
 #AddressFamily any
 #ListenAddress 0.0.0.0
@@ -22,7 +24,7 @@
 
 # Logging
 #SyslogFacility AUTH
-LogLevel VERBOSE
+#LogLevel INFO
 
 # Authentication:
 
@@ -98,6 +100,8 @@ PrintMotd no
 #ClientAliveCountMax 3
 #UseDNS no
 #PidFile /var/run/sshd.pid
+# 4 unathenticated connections before we start dropping
+# connections; drop everything at 10 unauthenticated connections.
 MaxStartups 4:50:10
 #PermitTunnel no
 #ChrootDirectory none
