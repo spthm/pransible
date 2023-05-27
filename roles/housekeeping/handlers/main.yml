@@ -13,7 +13,10 @@
     state: restarted
   become: yes
 
+- name: restart journald
   ansible.builtin.systemd:
+    name: systemd-journald
     enabled: yes
     state: restarted
+  become: yes
 ...
