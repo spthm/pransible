@@ -1,0 +1,11 @@
+---
+- hosts: airplay
+  roles:
+    - hostname
+    - harden
+    - slim
+    - headless
+    - housekeeping
+    - shairport-sync
+    - hifiberry
+...

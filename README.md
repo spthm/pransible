@@ -31,3 +31,36 @@ ansible-playbook -e "bootstrap_user=pi" -c paramiko --ask-pass ./bootstrap.yml"
 ```
 
 **Un-comment** the `private_key_file` of `ansible.cfg` once bootstrapping is complete.
+
+## AirPlay
+
+The `airplay.yml` playbook assumes that bootstrapping has taken place, and specifically:
+
+* The RPi hostname is advertised (or the `hosts` file has been updated to specify an IP address).
+* SSH access is enabled for the user `ansible`.
+
+The `slim` and `headless` roles attempts to remove superfluous and GUI packages, respectively, but I would recommend using a Raspberry Pi OS **Lite** image for your raspbian install in the first place.
+
+The airplay playbook will,
+
+* set the hostname;
+* harden the RPi, including:
+  * removing the `pi` user,
+  * enforcing key-based SSH login,
+  * limiting incoming connections to local IPs only, and
+  * enabling unattended upgrades;
+* remove unnecessary packages (GUI, educational);
+* turn off unnecessary interfaces (SPI, camera, etc.);
+* minimize log disk I/O in an effort to prolong SSD life;
+* build, configure and install shairport-sync for AirPlay; and
+* configure the HiFi Berry DAC+ (for other HiFi Berry products, tweak the `hifiberry.yml`).
+
+The playbook requires the `community.general` collection,
+
+```console
+ansible-galaxy collection install community.general
+```
+
+```console
+ansible-playbook ./airplay.yml"
+```
