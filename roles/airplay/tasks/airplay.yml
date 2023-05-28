@@ -1,41 +1,54 @@
 ---
-- name: Open Real Time Streaming port for AirPlay
+- name: Gather package facts
+  ansible.builtin.package_facts:
+    manager: auto
+  become: yes
+
+- name: Open RTSP port for AirPlay
   community.general.ufw:
     rule: allow
     direction: in
-    port: "{{ shairport_tcp_port }}"
+    port: "{{ shairport_rtsp_port }}"
     proto: tcp
     src: "{{ item }}"
   loop: "{{ private_local_addresses }}"
+  become: yes
+  when: "'ufw' in ansible_facts.packages"
 
 - name: Open mDNS port for AirPlay
   community.general.ufw:
     rule: allow
     direction: in
-    port: 5353
+    port: "{{ shairport_mdns_port }}"
     proto: udp
     src: "{{ item }}"
   loop: "{{ private_local_addresses }}"
+  become: yes
+  when: "'ufw' in ansible_facts.packages"
 
-- name: Open ports for shairport-sync for AirPlay
+- name: Open RTP ports for AirPlay
   community.general.ufw:
     rule: allow
     direction: in
-    port: "{{ shairport_ports }}"
+    port: "{{ shairport_rtp_ports }}"
     proto: udp
     src: "{{ item }}"
   loop: "{{ private_local_addresses }}"
+  become: yes
+  when: "'ufw' in ansible_facts.packages"
 
 - name: Install shairport-sync dependencies
   ansible.builtin.apt:
     name: "{{ shairport_dep_packages }}"
     state: latest
+  become: yes
 
 - name: Create shairport-sync group
   ansible.builtin.group:
     name: shairport-sync
     system: yes
     state: present
+  become: yes
 
 - name: Create shairport-sync user
   ansible.builtin.user:
@@ -47,14 +60,25 @@
     groups: audio
     append: yes
     state: present
+  become: yes
+
+- name: Check for shairport-sync systemd unit
+  ansible.builtin.shell: systemctl status shairport-sync
+  register: shairport_status
+  become: yes
+  failed_when: shairport_status.rc > 4
+
+- ansible.builtin.set_fact:
+    shairport_installed: "{{ shairport_status.rc != 4 }}"
 
 - name: Create shairport-sync directory
   ansible.builtin.file:
     path: "{{ shairport_dir }}"
     state: directory
-    owner: root
-    group: root
+    owner: ansible
+    group: ansible
     mode: 0755
+  become: yes
 
 - name: Clone shairport-sync
   ansible.builtin.git:
@@ -62,34 +86,69 @@
     dest: "{{ shairport_dir }}"
     version: "{{ shairport_version }}"
     depth: 1
+  register: shairport_clone
+
+- name: Disabled old shairport-sync service
+  ansible.builtin.systemd:
+    name: shairport-sync.service
+    enabled: no
+    state: stopped
+  become: yes
+  when: shairport_clone.changed and shairport_installed
+
+- name: Remove old shairport-sync service files
+  ansible.builtin.command:
+    cmd: "rm -f {{ item }}"
+    removes: "{{ item }}"
+  with_items:
+    - /etc/systemd/system/shairport-sync.service
+    - /etc/systemd/user/shairport-sync.service
+    - /lib/systemd/system/shairport-sync.service
+    - /lib/systemd/user/shairport-sync.service
+    - /etc/init.d/shairport-sync
+  become: yes
+  when: shairport_clone.changed
+
+- name: Clean old build config
+  ansible.builtin.command: "rm -f {{ shairport_dir }}/configure"
+  when: shairport_clone.changed
 
 - name: Generate build system files for shairport-sync
   ansible.builtin.command: autoreconf -fi
   args:
     chdir: "{{ shairport_dir }}"
-  become: yes
+    creates: "{{ shairport_dir }}/configure"
 
 - name: Configure build for shairport-sync
   ansible.builtin.command: ./configure --sysconfdir=/etc --with-alsa --with-avahi --with-ssl=openssl --with-systemd
   args:
     chdir: "{{ shairport_dir }}"
-  become: yes
+    creates: "{{ shairport_dir }}/Makefile"
 
 - name: Build shairport-sync
-  ansible.builtin.command: make
-  args:
+  community.general.make:
     chdir: "{{ shairport_dir }}"
-  become: yes
 
 - name: Install shairport-sync
-  ansible.builtin.command: make install
-  args:
+  community.general.make:
     chdir: "{{ shairport_dir }}"
-  become: yes
+    target: install
+  become: true
 
-- name: Enable shareport-sync
+- name: Configure shairport-sync
+  ansible.builtin.template:
+    src: templates/shairport-sync.conf.j2
+    dest: /etc/shairport-sync.conf
+    owner: root
+    group: root
+    mode: "0644"
+  become: yes
+  notify: restart shairport-sync service
+
+- name: Enable shairport-sync
   ansible.builtin.systemd:
     name: shairport-sync.service
     enabled: yes
-    state: restarted
+    state: started
+  become: yes
 ...
