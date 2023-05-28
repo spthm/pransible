@@ -1,8 +1,7 @@
 ---
-- name: restart avahi service
+- name: restart shairport-sync service
   ansible.builtin.systemd:
-    name: avahi-daemon.service
-    daemon_reload: yes
+    name: shairport-sync
     enabled: yes
     state: restarted
   become: yes
