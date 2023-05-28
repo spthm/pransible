@@ -1,30 +1,48 @@
 ---
-- name: Remove onboard sound driver
+- name: Disable onboard sound driver
   ansible.builtin.lineinfile:
     dest: /boot/config.txt
-    state: absent
-    regexp: "^dtparam=audio=on"
+    state: present
+    regexp: "^#?\\s*dtparam=audio=on"
+    line: "#dtparam=audio=on"
+  become: yes
   notify: reboot
 
 - name: Disable vc4-fkms-3d
   ansible.builtin.lineinfile:
-    path: /etc/selinux/config
+    path: /boot/config.txt
     regexp: '^dtoverlay=vc4-fkms-v3d'
     line: dtoverlay=vc4-fkms-v3d,audio=off
+    backrefs: yes
+  become: yes
   notify: reboot
 
 - name: Disable vc4-kms-3d
   ansible.builtin.lineinfile:
-    path: /etc/selinux/config
+    path: /boot/config.txt
     regexp: '^dtoverlay=vc4-kms-v3d'
     line: dtoverlay=vc4-kms-v3d,noaudio
+    backrefs: yes
+  become: yes
   notify: reboot
 
 - name: Enable Dac+
   ansible.builtin.lineinfile:
     dest: /boot/config.txt
     line: "dtoverlay=hifiberry-dacplus"
+    insertafter: "^#dtparam=audio=on"
     state: present
+  become: yes
+  notify: reboot
+
+- name: Enable Dac+
+  ansible.builtin.lineinfile:
+    dest: /boot/config.txt
+    line: "force_eeprom_read=0"
+    insertafter: "^dtoverlay=hifiberry-dacplus"
+    state: present
+  become: yes
+  when: "ansible_facts.kernel is version('5.4', '>=')"
   notify: reboot
 
 - name: Configure alsa
@@ -34,12 +52,18 @@
     owner: root
     group: root
     mode: "0644"
+  become: yes
   notify: reboot
 
+# This light is supposed to be on only when the audio device is being used, but in
+# practice it may come on after boot until after first use. The command here plays
+# a bit of white noise (at 0% volume) after boot as a workaround.
 - name: Turn off HiFi Berry DAC lights after boot
   ansible.builtin.lineinfile:
     dest: /etc/rc.local
     line: (sleep 10 && amixer -q set Digital 0% && aplay -q -D sysdefault -c 2 /usr/share/sounds/alsa/Noise.wav; amixer -q set Digital 100%) &
     state: present
+    insertbefore: "exit 0"
+  become: yes
   notify: reboot
 ...

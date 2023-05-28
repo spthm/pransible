@@ -1,4 +1,3 @@
 ---
 - import_tasks: hifiberry.yml
-  become: yes
 ...
