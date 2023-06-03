@@ -15,12 +15,27 @@
   become: yes
   when: "'ufw' in ansible_facts.packages"
 
-- name: Open mDNS port for AirPlay
+- name: Allow IPv4 mDNS multicast traffic
   community.general.ufw:
+    state: enabled
     rule: allow
     direction: in
-    port: "{{ shairport_mdns_port }}"
+    port: 5353
     proto: udp
+    dest: "224.0.0.251"
+    src: "{{ item }}"
+  loop: "{{ private_local_addresses }}"
+  become: yes
+  when: "'ufw' in ansible_facts.packages"
+
+- name: Allow IPv6 mDNS multicast traffic
+  community.general.ufw:
+    state: enabled
+    rule: allow
+    direction: in
+    port: 5353
+    proto: udp
+    dest: "ff02::fb"
     src: "{{ item }}"
   loop: "{{ private_local_addresses }}"
   become: yes
