@@ -4,12 +4,29 @@
     name: "{{ gui_packages }}"
     purge: yes
     state: absent
+  become: yes
   notify: autoremove
 
 - name: Install vim
   ansible.builtin.apt:
     name: vim
     state: latest
+  become: yes
+
+- name: Install Avahi
+  ansible.builtin.apt:
+    name: avahi-daemon
+    state: latest
+  become: yes
+
+- name: Disable IPv6 for Avahi
+  ansible.builtin.lineinfile:
+    path: /etc/avahi/avahi-daemon.conf
+    regexp: 'use-ipv6='
+    line: use-ipv6=no
+    backrefs: yes
+  become: yes
+  notify: restart avahi service
 
 - name: Advertise SSH Service via Avahi
   ansible.builtin.template:
