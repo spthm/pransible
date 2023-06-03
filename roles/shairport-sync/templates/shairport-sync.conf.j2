@@ -12,7 +12,9 @@ general =
 	port = {{ shairport_rtsp_port }}; // Listen for service requests on this port
 	udp_port_base = {{ shairport_rtp_port_base }}; // start allocating UDP ports from this port number when needed
 	udp_port_range = {{ shairport_rtp_port_range }}; // look for free ports in this number of places, starting at the UDP port base. Allow at least 10, though only three are needed in a steady state.
-	drift_tolerance_in_seconds = {{ shairport_drift_tolerance_in_seconds }}; // allow a timing error of this number of seconds of drift away from exact synchronisation before attempting to correct it
+	audio_backend_buffer_desired_length_in_seconds = {{ shairport_audio_buffer_length_in_seconds }}; // If set too small, buffer underflow occurs on low-powered machines.
+//		Too long and the response time to volume changes becomes annoying.
+//		Default is 0.2 seconds in the alsa backend, 0.35 seconds in the pa backend and 1.0 seconds otherwise.
 };
 
 // Advanced parameters for controlling how Shairport Sync stays active and how it runs a session

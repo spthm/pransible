@@ -23,6 +23,6 @@ shairport_rtp_ports: "6001:6010"
 shairport_rtp_port_base: 6001
 shairport_rtp_port_range: 10
 
-shairport_drift_tolerance_in_seconds: 0.010
+shairport_audio_buffer_length_in_seconds: 0.4
 shairport_session_timeout: 45
 ...
