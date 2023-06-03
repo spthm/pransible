@@ -11,7 +11,7 @@
     port: "{{ shairport_rtsp_port }}"
     proto: tcp
     src: "{{ item }}"
-  loop: "{{ private_local_addresses }}"
+  loop: "{{ private_local_addresses_v4 + private_local_addresses_v6 }}"
   become: yes
   when: "'ufw' in ansible_facts.packages"
 
@@ -24,7 +24,7 @@
     proto: udp
     dest: "224.0.0.251"
     src: "{{ item }}"
-  loop: "{{ private_local_addresses }}"
+  loop: "{{ private_local_addresses_v4 }}"
   become: yes
   when: "'ufw' in ansible_facts.packages"
 
@@ -37,7 +37,7 @@
     proto: udp
     dest: "ff02::fb"
     src: "{{ item }}"
-  loop: "{{ private_local_addresses }}"
+  loop: "{{ private_local_addresses_v6 }}"
   become: yes
   when: "'ufw' in ansible_facts.packages"
 
@@ -48,7 +48,7 @@
     port: "{{ shairport_rtp_ports }}"
     proto: udp
     src: "{{ item }}"
-  loop: "{{ private_local_addresses }}"
+  loop: "{{ private_local_addresses_v4 + private_local_addresses_v6 }}"
   become: yes
   when: "'ufw' in ansible_facts.packages"
 

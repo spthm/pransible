@@ -1,7 +1,9 @@
 ---
-private_local_addresses:
+private_local_addresses_v4:
   - 10.0.0.0/8
   - 172.16.0.0/12
   - 192.168.0.0/16
+
+private_local_addresses_v6:
   - fe80::/64
 ...

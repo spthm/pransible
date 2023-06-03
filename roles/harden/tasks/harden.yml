@@ -30,7 +30,7 @@
     port: 22
     proto: tcp
     src: "{{ item }}"
-  loop: "{{ private_local_addresses }}"
+  loop: "{{ private_local_addresses_v4 + private_local_addresses_v6 }}"
 
 - name: Allow IPv4 mDNS multicast traffic
   community.general.ufw:
@@ -41,7 +41,7 @@
     proto: udp
     dest: 224.0.0.251
     src: "{{ item }}"
-  loop: "{{ private_local_addresses }}"
+  loop: "{{ private_local_addresses_v4 }}"
 
 - name: Allow IPv6 mDNS multicast traffic
   community.general.ufw:
@@ -52,7 +52,7 @@
     proto: udp
     dest: ff02::fb
     src: "{{ item }}"
-  loop: "{{ private_local_addresses }}"
+  loop: "{{ private_local_addresses_v6 }}"
 
 - name: Deny everything else, set low logging
   community.general.ufw:
