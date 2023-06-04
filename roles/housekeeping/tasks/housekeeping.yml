@@ -1,21 +1,49 @@
 ---
 - name: Checking if Realtek 8192 driver loaded
-  ansible.builtin.shell: lsmod | grep 8192
+  ansible.builtin.shell: lsmod | grep -e '^8192cu'
   ignore_errors: true
-  register: lsmod_8192
+  register: lsmod_8192cu
 
 - ansible.builtin.set_fact:
-    loaded_8192_driver: "{{ lsmod_8192.rc == 0 }}"
+    loaded_8192_driver: "{{ lsmod_8192cu.rc == 0 }}"
 
-- name: Disabling WiFi power saving
+- name: Checking if rtl8192cu driver loaded
+  ansible.builtin.shell: lsmod | grep -e '^rtl8192cu'
+  ignore_errors: true
+  register: lsmod_rtl8192cu
+
+- ansible.builtin.set_fact:
+    loaded_rtl8192_driver: "{{ lsmod_rtl8192cu.rc == 0 }}"
+
+- name: Disabling WiFi power saving for Realtek 8192cu
   become: yes
   ansible.builtin.template:
-    src: templates/8192.conf.j2
-    dest: /etc/modprobe.d/8192.conf
+    src: templates/8192cu.conf.j2
+    dest: /etc/modprobe.d/8192cu.conf
     owner: root
     group: root
     mode: "0644"
   when: loaded_8192_driver
+
+- name: Disabling WiFi power saving for rtl8192cu 1/2
+  become: yes
+  ansible.builtin.template:
+    src: templates/wireless-power-off.j2
+    dest: /etc/network/interfaces.d/wireless-power-off
+    owner: root
+    group: root
+    mode: "0644"
+  when: loaded_rtl8192_driver
+
+- name: Disabling WiFi power saving for rtl8192cu 2/2
+  become: yes
+  ansible.builtin.template:
+    src: templates/wlan0-power-mgmt-off.j2
+    dest: /etc/network/if-up.d/wlan0-power-mgmt-off
+    owner: root
+    group: root
+    mode: "0744"
+  when: loaded_rtl8192_driver
 
 - name: Check for tmp.mount systemd unit
   ansible.builtin.shell: systemctl status tmp.mount
