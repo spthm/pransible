@@ -19,14 +19,14 @@
     state: latest
   become: yes
 
-- name: Disable IPv6 for Avahi
-  ansible.builtin.lineinfile:
-    path: /etc/avahi/avahi-daemon.conf
-    regexp: 'use-ipv6='
-    line: use-ipv6=no
-    backrefs: yes
-  become: yes
-  notify: restart avahi service
+- name: Restart Avahi daily
+  ansible.builtin.cron:
+    name: "restart avahi daily to avoid incrementing-hostname bug"
+    minute: "00"
+    hour: "02"
+    job: "systemctl restart avahi-daemon.service"
+    user: root
+  notify: reboot
 
 - name: Advertise SSH Service via Avahi
   ansible.builtin.template:
