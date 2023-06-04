@@ -71,24 +71,21 @@
     name: "turn off power LED in the evening"
     minute: "00"
     hour: "20"
-    job: "echo 0 > /sys/class/leds/led1/brightness"
+    job: "echo 0 > /sys/class/leds/PWR/brightness"
     user: root
-  notify: reboot
 
 - name: Turn on the power LED in the morning
   ansible.builtin.cron:
     name: "turn on power LED in the morning"
     minute: "00"
     hour: "08"
-    job: "echo 1 > /sys/class/leds/led1/brightness"
+    job: "echo 1 > /sys/class/leds/PWR/brightness"
     user: root
-  notify: reboot
 
 - name: Turn off the power LED after reboot
   ansible.builtin.cron:
-    name: "turn on power LED after reboot"
+    name: "turn off power LED after reboot"
     special_time: reboot
-    job: "echo 0 > /sys/class/leds/led1/brightness"
+    job: "echo 0 > /sys/class/leds/PWR/brightness"
     user: root
-  notify: reboot
 ...
