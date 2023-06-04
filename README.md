@@ -8,19 +8,19 @@ It has only been tested on a Raspberry Pi 2 and Raspberry Pi OS Lite (32-bit, bu
 ## Boostrapping
 
 WiFi and hostname set up can be done with current versions of the [Raspberry Pi Imager tool][raspberry-software] (**recommended**).
-SSH access with SSH keys an also be set with that tool, but using this bootstrap playbook will ensure usernames and keyfiles match the rest of the configuration.
+SSH access with SSH keys can also be set with that tool, but using this bootstrap playbook will ensure usernames and keyfiles match the rest of the configuration.
 
 The bootstrap playbook will,
 
-* create an `ansible` user on the RPi and configure it for key-based SSH access for the control (your local) machine; and
-* ensure the the RPi hostname is set as desired;
+* create an `ansible` user on the RPi and configure it for key-based SSH access for the control (your local) machine;
+* ensure the the RPi hostname is set as desired; and
 * set the WiFi credentials.
 
 **This role will add SSH keyfiles on your machine at `~/.ssh/id_ansible` and `~/.ssh/id_ansible.pub`.**
 
 Note that,
 
-* You need provide a bootstrap username (a user that already exists on the RPi and has SSH access enabled) to the bootstrap playbook, via the `bootstrap_user` variable.
+* You need to provide a bootstrap username (a user that already exists on the RPi and has SSH access enabled) to the bootstrap playbook, via the `bootstrap_user` variable.
 * Hostname values are set in `hosts` **and** `host_vars/<host>.yml`.
 * The `ansible.posix` and `community.crypto` collections are required.
 
@@ -40,10 +40,10 @@ ansible-playbook -e "bootstrap_user=pi" -c paramiko --ask-pass ./bootstrap.yml"
 
 The `airplay.yml` playbook assumes that bootstrapping has taken place, and specifically:
 
-* The RPi hostname is advertised (or the `hosts` file has been updated to specify an IP address).
+* The RPi hostname is advertised for SSH (or you have a local DNS resolver, or the `hosts` file has been updated to specify an IP address).
 * SSH access is enabled for the user `ansible`.
 
-The `slim` and `headless` roles attempt to remove superfluous and GUI packages, respectively, but I would recommend using a Raspberry Pi OS **Lite** image for your raspbian install in the first place.
+The `slim` and `headless` roles attempt to remove superfluous and GUI packages, respectively, but I would recommend using a Raspberry Pi OS **Lite** image in the first place.
 
 The airplay playbook will,
 
