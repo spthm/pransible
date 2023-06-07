@@ -2,8 +2,17 @@ Unattended-Upgrade::Origins-Pattern {
         // Codename based matching:
         // This will follow the migration of a release through different
         // archives (e.g. from testing to stable and later oldstable).
-        "o=Raspbian,n=${distro_codename}";
-        "o=Raspbian,n=${distro_codename}-updates";
+        // 64-bit Raspberry Pi OS is mostly userland Debian, uses Debian channels.
+        // The below has not been fully vetted for 64-bit OS. Some Pi-specific
+        // packages for 64-bit OS may still come from the Raspbian channels.
+        "origin=Debian,codename=${distro_codename}-updates";
+        "origin=Debian,codename=${distro_codename},label=Debian";
+        "origin=Debian,codename=${distro_codename},label=Debian-Security";
+        "origin=Debian,codename=${distro_codename}-security,label=Debian-Security";
+        // 32-bit Raspberry Pi OS is Raspbian-based. Note the Raspbian and
+        // Raspberry Pi Foundation don't have a separate security channel.
+        "origin=Raspbian,codename=${distro_codename},label=Raspbian";
+        "origin=Raspberry Pi Foundation,codename=${distro_codename},label=Raspberry Pi Foundation";
 };
 
 // Do automatic removal of new unused dependencies after the upgrade
@@ -11,11 +20,9 @@ Unattended-Upgrade::Origins-Pattern {
 Unattended-Upgrade::Remove-Unused-Dependencies "true";
 
 // Automatically reboot *WITHOUT CONFIRMATION* if
-//  the file /var/run/reboot-required is found after the upgrade
+// the file /var/run/reboot-required is found after the upgrade
 Unattended-Upgrade::Automatic-Reboot "true";
 
 // If automatic reboot is enabled and needed, reboot at the specific
 // time instead of immediately
 Unattended-Upgrade::Automatic-Reboot-Time "04:00";
-
-Unattended-Upgrade::Mail "root";
