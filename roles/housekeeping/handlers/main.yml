@@ -1,4 +1,11 @@
 ---
+- name: restart networkmanager
+  ansible.builtin.systemd:
+    name: networkmanager
+    enabled: yes
+    state: restarted
+  become: yes
+
 - name: restart tmp.mount
   ansible.builtin.systemd:
     name: tmp.mount
