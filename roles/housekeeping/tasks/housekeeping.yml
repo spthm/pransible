@@ -27,15 +27,6 @@
     group: root
     mode: "0644"
 
-- name: Disable WiFi power saving on interface up
-  become: yes
-  ansible.builtin.template:
-    src: templates/wlan0-power-mgmt-off.j2
-    dest: /etc/network/if-up.d/wlan0-power-mgmt-off
-    owner: root
-    group: root
-    mode: "0744"
-
 - name: Disable WiFi power saving in NetworkManager
   become: yes
   ansible.builtin.template:
