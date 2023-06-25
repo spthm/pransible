@@ -14,6 +14,7 @@
     dest: /etc/wpa_supplicant/wpa_supplicant.conf
     owner: root
     group: root
+    # Not readable by all as it contains a passphrase, albeit PSK'd.
     mode: "0600"
   notify: Reload wpa_supplicant
 ...
