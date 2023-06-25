@@ -76,11 +76,22 @@
     mode: 0644
   notify: restart tmp.mount
 
+- name: Create systemd-journald overrides directory
+  file:
+    path: /etc/systemd/journald.conf.d/
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  become: yes
+
 - name: Limit /var/log/journal size
-  ansible.builtin.lineinfile:
-    path: /etc/systemd/journald.conf
-    regexp: 'SystemMaxUse='
-    line: SystemMaxUse=30M
+  ansible.builtin.template:
+    src: templates/00-journal-size.conf.j2
+    dest: /etc/systemd/journald.conf.d/00-journal-size.conf
+    owner: root
+    group: root
+    mode: 0644
   notify: restart journald
 
 - name: Install log2ram dependencies
