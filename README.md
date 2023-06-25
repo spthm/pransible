@@ -69,7 +69,7 @@ ansible-galaxy collection install community.general
 Then and thereafter,
 
 ```console
-ansible-playbook ./airplay.yml"
+ansible-playbook ./airplay.yml
 ```
 
 [shairport-sync]: https://github.com/mikebrady/shairport-sync
