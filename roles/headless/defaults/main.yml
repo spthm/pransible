@@ -16,6 +16,7 @@ gui_packages:
   - raspberrypi-ui-mods
   - weston
   - x2x
+  - xauth
   - xinit
   - xserver-xorg*
   - xpdf
