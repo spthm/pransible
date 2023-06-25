@@ -1,13 +1,15 @@
 country={{ wifi_country_code }}
 ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
 update_config=1
+autoscan=exponential:3:300
 # mt7601u chipset/drivers do not seem to behave well when bound to one of multiple
 # access points (for ASUS, at least). Instead, allow roaming but configure a regular
 # re-scan on a weak signal (and infrequent otherwise).
-bgscan="simple:15:-70:86400"
+bgscan="simple:15:-65:86400"
 
 network={
     ssid="{{ wifi_ssid }}"
+    bgscan="simple:15:-65:86400"
     proto=RSN
     auth_alg=OPEN
     key_mgmt=WPA-PSK
