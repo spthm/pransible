@@ -1,0 +1,125 @@
+[SERVICE]
+    flush          5
+    daemon         Off
+    log_level      info
+
+    parsers_file   parsers.conf
+    plugins_file   plugins.conf
+
+    http_server    Off
+
+    scheduler.base 10
+    scheduler.cap  900
+
+[INPUT]
+    name          systemd
+    tag           log.journald.*
+    lowercase     on
+    max_entries   1000
+    db            {{ flb_journald_db_path }}
+    db.sync       off
+    mem_buf_limit 10MB
+
+[INPUT]
+    name              tail
+    tag               log.tail.unattended-upgrades
+    path              /var/log/unattended-upgrades/*.log
+    path_key          logfile
+    exclude_path      *.bz2,*.gz,*.xz,*.zip
+    key               message
+    refresh_interval  240
+    skip_empty_lines  on
+    db                {{ flb_unattended_upgrades_db_path }}
+    db.journal_mode   WAL
+    db.sync           normal
+    db.locking        true
+    static_batch_size 5M
+    mem_buf_limit     10MB
+
+[INPUT]
+    name            node_exporter_metrics
+    tag             metric.node_exporter
+    # cpu generates errors about missing core_throttle_count on RPi2
+    # cpufreq reports CPU frequency
+    # diskstats reports I/O (read/write) rates, but seems not to be reliable,
+    #           sometime see values of ~10^234 YB/s!
+    # filefd reports open files, other FD-related metrics missing (on RPi 2)?
+    # filesystem includes disk usage and (incorrectly on RPi 2) disk available,
+    #            filesystem node info and error/readonly counts
+    # loadavg reports 1m, 5m and 15m load averages
+    # meminfo reports memory usage, memory mappings, etc.
+    # netdev reports network I/O rates over all interfaces
+    # stat includes last-boot time, forks and interruptions
+    # systemd reports # units in each state, systemd sockets and corresponding unit
+    # time reports only the current system time, but can be used with the boot
+    #      time report of stat to calculate system uptime
+    # uname reports release, machine name etc., mostly useful just so the
+    #       data can be used to populate dashboard fields w/ host selection
+    # vmstat is mostly about memory pages, includes OOM killer invocations
+    # fluent-bit docs are out of date; run this with all metrics commented out
+    # and debug logs to see the full list of (default) metrics, and
+    #   https://github.com/fluent/fluent-bit/blob/2060c69cad82656abed590fca051842859cb5230/plugins/in_node_exporter_metrics/ne.c#L345-L358
+    # metrics cpu,cpufreq,diskstats,filefd,filesystem,loadavg,meminfo,netdev,stat,systemd,time,uname,vmstat
+    metrics cpu,diskstats,filesystem,loadavg,meminfo,netdev,uname
+    scrape_interval 30
+    collector.diskstats.scrape_interval 60
+    collector.filesystem.scrape_interval 300
+    collector.loadavg.scrape_interval 60
+    collector.netdev.scrape_interval 60
+    collector.uname.scrape_interval 300
+
+    # This is the default regex with the addition of /run/user/.+
+    #   https://github.com/fluent/fluent-bit/blob/1a197e83b32ee89e9e86a7b55e947c8255d47377/plugins/in_node_exporter_metrics/ne.h#LL35C30-L35C120
+    # fluent-bit seems to have a bug where, if a mount is removed (as /run/user/<ID>
+    # is once user <ID> logs out), the last-recorded metric(s) for that mount
+    # point are continually reported, and at some point will start being rejected
+    # by mimir as too old, producing lots of error messages.
+    filesystem.ignore_mount_point_regex ^/(dev|proc|run/credentials/.+|run/user/.+|sys|var/lib/docker/.+|var/lib/containers/storage/.+)($|/)
+
+    mem_buf_limit 10MB
+
+[FILTER]
+    name    grep
+    match   log.journald.fluent-bit*
+    exclude message CPU is missing core_throttle_count
+
+[FILTER]
+    name   lua
+    match  log.journald.*
+    script systemd-loglevel.lua
+    call   set_log_level
+
+[FILTER]
+    Name   record_modifier
+    Match  log.journald.*
+    Record log_source journald
+
+[FILTER]
+    Name   record_modifier
+    Match  log.tail.*
+    Record log_source tail
+
+[OUTPUT]
+    name        loki
+    match       log.*
+    labels      job=fluentbit
+    host        {{ grafana_loki_host }}
+    port        443
+    tls         on
+    tls.verify  on
+    http_user   {{ grafana_loki_api_user }}
+    http_passwd {{ grafana_loki_api_key }}
+    retry_limit 8
+
+[OUTPUT]
+    name        prometheus_remote_write
+    host        {{ grafana_prometheus_host }}
+    match       metric.node_exporter
+    add_label   job fluentbit
+    uri         /api/prom/push
+    port        443
+    tls         on
+    tls.verify  on
+    http_user   {{ grafana_prometheus_api_user }}
+    http_passwd {{ grafana_prometheus_api_key }}
+    retry_limit 4

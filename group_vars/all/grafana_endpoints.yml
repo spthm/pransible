@@ -1,0 +1,3 @@
+---
+grafana_loki_host: logs-prod-008.grafana.net
+grafana_prometheus_host: prometheus-prod-05-gb-south-0.grafana.net

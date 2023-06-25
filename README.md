@@ -58,6 +58,7 @@ The airplay playbook will,
 * minimize log disk I/O in an effort to prolong SSD life;
 * build, configure and install shairport-sync for AirPlay; and
 * configure the [HiFi Berry][hifiberry] DAC+ (for other HiFi Berry products, [tweak][hifiberry-config] the `hifiberry.yml`).
+* **if** the `grafana-logs` role is uncommented and variables updated in `group_vars/all/grafana*`, configure `fluent-bit` to ship logs and metrics to your Grafana Cloud account (the free tier is more than sufficient for a few RPis!)
 
 The playbook requires the `community.general` collection,
 

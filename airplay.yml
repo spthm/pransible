@@ -6,6 +6,9 @@
     - slim
     - headless
     - housekeeping
+    # The grafana logs role requires a Grafana Cloud account and updating variables
+    # in group_vars/all/grafana*.yml.
+    # - grafana-logs
     - shairport-sync
     - hifiberry
 ...

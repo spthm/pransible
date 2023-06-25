@@ -1,0 +1,25 @@
+-- Some services do not set priority correctly, leading to all messages having
+-- priority 6 (info). Not setting 'level' for priority 6 messages allows Grafana's
+-- auto-colouring to set these lines to the appropriate colour if they contain an
+-- "error", "warn" etc. string. Otherwise, they will be grey for "unknown".
+levels = {
+  ["7"]="debug",
+  ["6"]=nil,
+  ["5"]="notice",
+  ["4"]="warning",
+  ["3"]="error",
+  ["2"]="critical",
+  ["1"]="alert",
+  ["0"]="emerg"
+}
+
+function set_log_level(tag, timestamp, record)
+    loglevel = levels[record["priority"]]
+    if loglevel == nil then
+        return 0, timestamp, record
+    end
+
+    new_record = record
+    new_record["level"] = loglevel
+    return 2, timestamp, new_record
+end

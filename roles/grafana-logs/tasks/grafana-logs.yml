@@ -1,0 +1,95 @@
+---
+- name: Install python3-debian for deb822_repository module
+  ansible.builtin.apt:
+    name: python3-debian
+    state: latest
+
+- name: Add fluent bit repository
+  ansible.builtin.deb822_repository:
+    name: fluent-bit
+    types: [deb]
+    uris: "https://packages.fluentbit.io/raspbian/{{ ansible_distribution_release }}"
+    suites: ["{{ ansible_distribution_release | lower }}"]
+    components: [main]
+    # id: C3C0A28534B9293EAF51FABD9F9DDC083888C1CD
+    signed_by: https://packages.fluentbit.io/fluentbit.key
+    enabled: yes
+  register: fluentbit_repo
+  become: yes
+
+- name: Update APT cache
+  ansible.builtin.apt:
+    update_cache: true
+  become: yes
+  when: fluentbit_repo.changed
+
+- name: Install fluent bit
+  ansible.builtin.apt:
+    name: fluent-bit=2.*
+    state: latest
+  become: yes
+
+- name: Create fluent-bit journald DB directory
+  file:
+    path: "{{ flb_journald_db_path | dirname }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  become: yes
+
+- name: Create fluent-bit unattended-upgrades DB directory
+  file:
+    path: "{{ flb_unattended_upgrades_db_path | dirname }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  become: yes
+
+- name: Enable fluent-bit service
+  ansible.builtin.systemd:
+    name: fluent-bit
+    enabled: yes
+    state: started
+  become: yes
+
+- name: Add fluent-bit systemd loglevel filter
+  ansible.builtin.template:
+    src: templates/systemd-loglevel.lua.j2
+    dest: /etc/fluent-bit/systemd-loglevel.lua
+    owner: root
+    group: root
+    mode: "0644"
+  become: yes
+  notify: Restart fluent-bit service
+
+- name: Configure fluent-bit service
+  ansible.builtin.template:
+    src: templates/fluent-bit.conf.j2
+    dest: /etc/fluent-bit/fluent-bit.conf
+    owner: root
+    group: root
+    mode: "0644"
+  become: yes
+  notify: Restart fluent-bit service
+
+- name: Create fluent-bit.service overrides directory
+  file:
+    path: /etc/systemd/system/fluent-bit.service.d/
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  become: yes
+
+- name: Suppress missing core_throttle_count errors
+  template:
+    src: templates/fluent-bit-override.conf.j2
+    dest: /etc/systemd/system/fluent-bit.service.d/override.conf
+    owner: root
+    group: root
+    mode: "0644"
+  become: yes
+  notify: Restart fluent-bit service
+...

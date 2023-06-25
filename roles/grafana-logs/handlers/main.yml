@@ -1,0 +1,8 @@
+---
+- name: Restart fluent-bit service
+  ansible.builtin.systemd:
+    name: fluent-bit.service
+    enabled: yes
+    state: restarted
+  become: yes
+...

@@ -1,0 +1,4 @@
+---
+flb_journald_db_path: /var/db/fluent-bit/journald.db
+flb_unattended_upgrades_db_path: /var/db/fluent-bit/unattended-upgrades.db
+...
