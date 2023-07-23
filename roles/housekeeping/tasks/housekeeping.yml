@@ -91,7 +91,15 @@
     owner: root
     group: root
     mode: 0644
+  become: yes
   notify: restart journald
+
+- name: Disable rsyslog
+  ansible.builtin.systemd:
+    name: rsyslog
+    enabled: no
+    state: stopped
+  become: yes
 
 - name: Install log2ram dependencies
   ansible.builtin.apt:
