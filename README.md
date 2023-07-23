@@ -23,6 +23,7 @@ Note that,
 * You need to provide a bootstrap username (a user that already exists on the RPi and has SSH access enabled) to the bootstrap playbook, via the `bootstrap_user` variable.
 * Hostname values are set in `hosts` **and** `host_vars/<host>.yml`.
 * The `ansible.posix` and `community.crypto` collections are required.
+* The Pi(s) must be available at the `ansible_host` value set in `hosts`.
 
 **You must comment out** the `private_key_file` of `ansible.cfg` before running bootstrapping: it references a keyfile that we have not yet created.
 
@@ -31,7 +32,7 @@ The `-c paramiko` option is only needed if `sshpass` is not installed on the con
 ```console
 ansible-galaxy collection install ansible.posix
 ansible-galaxy collection install community.crypto
-ansible-playbook -e "bootstrap_user=pi" -c paramiko --ask-pass ./bootstrap.yml"
+ansible-playbook -e "bootstrap_user=pi" -c paramiko --ask-pass ./bootstrap.yml
 ```
 
 **Un-comment** the `private_key_file` of `ansible.cfg` once bootstrapping is complete.
