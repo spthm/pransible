@@ -24,14 +24,15 @@
     state: present
   become: yes
 
-- name: Enable no password sudo for ansible user
+- name: Enable no password sudo for {{ username }} user
   ansible.builtin.template:
     src: templates/010_ansible-nopasswd.j2
     dest: "/etc/sudoers.d/010_{{ username }}-nopasswd"
     owner: root
     group: root
     mode: "0440"
-    validate: "visudo -cf %s %s"
+    validate: "visudo -cf %s"
+  become: yes
 
 - name: "Install SSH public key for {{ username }}"
   ansible.posix.authorized_key:
