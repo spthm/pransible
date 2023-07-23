@@ -35,7 +35,6 @@
     owner: root
     group: root
     mode: "0644"
-  notify: restart networkmanager
 
 - name: Check for tmp.mount systemd unit
   ansible.builtin.shell: systemctl status tmp.mount
