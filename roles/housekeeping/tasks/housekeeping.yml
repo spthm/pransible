@@ -94,6 +94,16 @@
   become: yes
   notify: restart journald
 
+- name: Disable journald forward to syslog
+  ansible.builtin.template:
+    src: templates/00-no-syslog-forward.conf.j2
+    dest: /etc/systemd/journald.conf.d/00-no-syslog-forward.conf
+    owner: root
+    group: root
+    mode: 0644
+  become: yes
+  notify: restart journald
+
 - name: Disable rsyslog
   ansible.builtin.systemd:
     name: rsyslog
