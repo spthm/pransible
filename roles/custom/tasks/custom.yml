@@ -1,0 +1,42 @@
+---
+# The default deny rule blocks multicast traffic from the router to 224.0.0.1 (a
+# generic 'all hosts' address), causing UFW to log it. An explicit deny prevents
+# this logging (for the default UFW configuration).
+- name: Deny IPv4 all-hosts multicast traffic
+  community.general.ufw:
+    state: enabled
+    rule: deny
+    dest: 224.0.0.1
+    src: "{{ item }}"
+  loop: "{{ private_local_addresses_v4 }}"
+  become: yes
+
+# Speculative fix. But Apple TV seems to be advertising itself as a router
+# on IPv6 (always? or just because the actual ASUS router is not?) and at
+# the very least, that is polluting the logs on occasional and spurious
+# dhcpcd wlan0: carrier lost events.
+# https://forum.openwrt.org/t/how-to-block-apple-tv-from-assigning-ipv6-ula/145115/11
+- name: Disable avahi ipv6
+  ansible.builtin.lineinfile:
+    path: /etc/avahi/avahi-daemon.conf
+    regexp: 'use-ipv6'
+    line: use-ipv6=no
+  become: yes
+  notify: restart avahi service
+
+# The carrier lost is still seen even with avahi ipv6 disabled. It
+# *looks* like some other device (Apple TV?) is advertising itself
+# as an IPv6 router (the 'actual' router is not) but the connection
+# keeps getting dropped (immediately prior to the 'carrier lost'
+# log line, dhcpcd always logs some fe80:: unreachable, and that
+# unreachable IP is the same one previously advertised as an IPv6
+# router). Note that 'noipv6rs' does not disable DHCPv6, so we
+# can still get an IPv6 address that way. We just ignore RAs..
+- name: Disable dhcpcd ipv6
+  ansible.builtin.lineinfile:
+    path: /etc/dhcpcd.conf
+    line: noipv6
+    insertafter: "domain_name_servers="
+    state: present
+  notify: Restart dhcpcd service
+...
